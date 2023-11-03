@@ -4,7 +4,11 @@ var livereload = require("livereload");
 var connectLiveReload = require("connect-livereload");
 const { initializeWebsocketServer } = require("./server/websocketserver");
 const { initializeAPI } = require("./server/api");
-const { initializeMariaDB, initializeDBSchema, executeSQL } = require("./server/database");
+const {
+  initializeMariaDB,
+  initializeDBSchema,
+  executeSQL,
+} = require("./server/database");
 
 // Create the express server
 const app = express();
@@ -29,15 +33,15 @@ app.use(express.static("client"));
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/client/index.html");
 });
-  // Initialize the websocket server
-  initializeWebsocketServer(server);
-  // Initialize the REST api
-  initializeAPI(app);
-  
-  // Allowing top-level await
-  (async function () {
+// Initialize the websocket server
+initializeWebsocketServer(server);
+// Initialize the REST api
+initializeAPI(app);
+
+// Allowing top-level await
+(async function () {
   // Initialize the database
-  await initializeMariaDB();
+  initializeMariaDB();
   await initializeDBSchema();
   // TODO: REMOVE!!!! test the database connection
   const result = await executeSQL("SELECT * FROM users;");

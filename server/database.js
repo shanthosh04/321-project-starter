@@ -1,25 +1,26 @@
 let pool = null;
 
-const initializeMariaDB = async () => {
+const initializeMariaDB = () => {
   const mariadb = require("mariadb");
   pool = mariadb.createPool({
     database: process.env.DB_NAME || "mychat",
-    host: process.env.DB_HOST || "localhost",
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "supersecret123",
+    host: process.env.DB_HOST || "0.0.0.0",
+    user: process.env.DB_USER || "mychat",
+    password: process.env.DB_PASSWORD || "mychatpassword",
     connectionLimit: 5,
   });
 };
 
 const executeSQL = async (query) => {
+  let conn;
   try {
     conn = await pool.getConnection();
     const res = await conn.query(query);
-    conn.end();
     return res;
   } catch (err) {
-    conn.end();
-    console.log(err)
+    console.log(err);
+  } finally {
+    if (conn) conn.release();
   }
 };
 
