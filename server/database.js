@@ -4,7 +4,7 @@ const initializeMariaDB = () => {
   const mariadb = require("mariadb");
   pool = mariadb.createPool({
     database: process.env.DB_NAME || "mychat",
-    host: process.env.DB_HOST || "0.0.0.0",
+    host: process.env.DB_HOST || "localhost",
     user: process.env.DB_USER || "mychat",
     password: process.env.DB_PASSWORD || "mychatpassword",
     connectionLimit: 5,
