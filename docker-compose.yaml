@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   mariadb:
-    image: mariadb:10.6.4-focal
+    image: mariadb:11.1.2
     command: '--default-authentication-plugin=mysql_native_password'
     volumes:
       - m321_project_mariadb:/var/lib/mysql
