@@ -1,21 +1,48 @@
 const WebSocket = require("ws");
 
-// Intiiate the websocket server
+const users = new Map(); // Speichert die Zuordnung von WebSocket zu Benutzernamen
+
 const initializeWebsocketServer = (server) => {
   const websocketServer = new WebSocket.Server({ server });
-  websocketServer.on("connection", onConnection);
+
+  websocketServer.on("connection", (ws) => {
+    console.log("New websocket connection");
+    
+    ws.on("message", (message) => {
+      const data = JSON.parse(message);
+      switch(data.type) {
+        case 'join':
+          users.set(ws, data.username);
+          broadcastUserList(websocketServer);
+          break;
+        case 'message':
+          // Nachrichtenbehandlung
+          break;
+        case 'requestUsers':
+          sendUserList(ws);
+          break;
+      }
+    });
+
+    ws.on("close", () => {
+      users.delete(ws);
+      broadcastUserList(websocketServer);
+    });
+  });
 };
 
-// If a new connection is established, the onConnection function is called
-const onConnection = (ws) => {
-  console.log("New websocket connection");
-  ws.on("message", (message) => onMessage(ws, message));
+const sendUserList = (ws) => {
+  const userList = Array.from(users.values());
+  ws.send(JSON.stringify({ type: 'userList', users: userList }));
 };
 
-// If a new message is received, the onMessage function is called
-const onMessage = (ws, message) => {
-  console.log("Message received: " + message);
-  ws.send("Hello, you sent -> " + message);
+const broadcastUserList = (websocketServer) => {
+  const userList = Array.from(users.values());
+  websocketServer.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify({ type: 'userList', users: userList }));
+    }
+  });
 };
 
 module.exports = { initializeWebsocketServer };

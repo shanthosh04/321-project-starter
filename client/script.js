@@ -6,20 +6,35 @@ const messageInput = document.getElementById('messageInput');
 const sendButton = document.getElementById('send');
 const socket = new WebSocket("ws://localhost:3000");
 
+// Funktion, um die Benutzerliste anzufordern
+const requestUserList = () => {
+  socket.send(JSON.stringify({ type: 'requestUsers' }));
+};
+
+// Event, das ausgelöst wird, sobald die WebSocket-Verbindung geöffnet ist
+socket.addEventListener('open', () => {
+  requestUserList(); // Benutzerliste anfordern, sobald die Verbindung hergestellt ist
+});
+
 usernameInput.addEventListener('change', (event) => {
   username = event.target.value;
   messageInput.disabled = !username;
-  socket.send(JSON.stringify({ type: 'join', username }));
+  if (username) {
+    socket.send(JSON.stringify({ type: 'join', username }));
+  }
 });
 
 socket.addEventListener('message', (event) => {
   const data = JSON.parse(event.data);
-  if (data.type === 'userList') {
-    displayUserList(data.users);
-  } else if (data.type === 'message') {
-    if (data.username !== username) {
-      displayMessage(data.username, data.message);
-    }
+  switch (data.type) {
+    case 'userList':
+      displayUserList(data.users);
+      break;
+    case 'message':
+      if (data.username !== username) {
+        displayMessage(data.username, data.message);
+      }
+      break;
   }
 });
 
@@ -38,7 +53,7 @@ function sendMessage() {
 
 function displayMessage(user, message) {
   const messageElement = document.createElement('div');
-  messageElement.textContent = '${user}: ${message}';
+  messageElement.textContent = user + ": " + message;
   messagesContainer.appendChild(messageElement);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
