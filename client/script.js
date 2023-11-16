@@ -32,13 +32,13 @@ function sendMessage() {
   }
   const message = messageInput.value;
   socket.send(JSON.stringify({ type: 'message', username, message }));
-  displayMessage(username, message); 
+  displayMessage(username, message);
   messageInput.value = '';
 }
 
 function displayMessage(user, message) {
   const messageElement = document.createElement('div');
-  messageElement.textContent = `${user}: ${message}`;
+  messageElement.textContent = '${user}: ${message}';
   messagesContainer.appendChild(messageElement);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
