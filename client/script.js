@@ -13,7 +13,7 @@ const requestUserList = () => {
 
 // Event, das ausgelöst wird, sobald die WebSocket-Verbindung geöffnet ist
 socket.addEventListener('open', () => {
-  requestUserList(); // Benutzerliste anfordern, sobald die Verbindung hergestellt ist
+  requestUserList(); 
 });
 
 usernameInput.addEventListener('change', (event) => {
