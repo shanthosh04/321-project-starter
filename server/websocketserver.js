@@ -1,22 +1,21 @@
 const WebSocket = require("ws");
-const connectedUsers = new Map(); 
 
+// Intiiate the websocket server
 const initializeWebsocketServer = (server) => {
   const websocketServer = new WebSocket.Server({ server });
-  websocketServer.on("connection", (ws) => {
-    ws.on("message", (message) => onMessage(ws, message, websocketServer));
-    ws.on("close", () => onClose(ws, websocketServer));
-  });
+  websocketServer.on("connection", onConnection);
 };
 
-const onMessage = (ws, message, websocketServer) => {
-  const data = JSON.parse(message);
-  if (data.type === 'join') {
-    connectedUsers.set(ws, data.username);
-    broadcastUserList(websocketServer);
-  } else if (data.type === 'message') {
-    broadcastMessage(websocketServer, data.username, data.message);
-  }
+// If a new connection is established, the onConnection function is called
+const onConnection = (ws) => {
+  console.log("New websocket connection");
+  ws.on("message", (message) => onMessage(ws, message));
+};
+
+// If a new message is received, the onMessage function is called
+const onMessage = (ws, message) => {
+  console.log("Message received: " + message);
+  ws.send("Hello, you sent -> " + message);
 };
 
 module.exports = { initializeWebsocketServer };
