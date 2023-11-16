@@ -19,24 +19,4 @@ const onMessage = (ws, message, websocketServer) => {
   }
 };
 
-const onClose = (ws, websocketServer) => {
-  connectedUsers.delete(ws);
-  broadcastUserList(websocketServer);
-};
-
-const broadcastUserList = (websocketServer) => {
-  const userList = Array.from(connectedUsers.values());
-  websocketServer.clients.forEach(client => {
-    client.send(JSON.stringify({ type: 'userList', users: userList }));
-  });
-};
-
-const broadcastMessage = (websocketServer, username, message) => {
-  websocketServer.clients.forEach(client => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify({ username, message }));
-    }
-  });
-};
-
 module.exports = { initializeWebsocketServer };
