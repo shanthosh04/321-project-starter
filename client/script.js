@@ -12,6 +12,16 @@ usernameInput.addEventListener('change', (event) => {
   socket.send(JSON.stringify({ type: 'join', username }));
 });
 
+socket.addEventListener('message', (event) => {
+  const data = JSON.parse(event.data);
+  if (data.type === 'userList') {
+    displayUserList(data.users);
+  } else if (data.type === 'message') {
+    if (data.username !== username) {
+      displayMessage(data.username, data.message);
+    }
+  }
+});
 
 sendButton.addEventListener('click', sendMessage);
 
@@ -22,7 +32,7 @@ function sendMessage() {
   }
   const message = messageInput.value;
   socket.send(JSON.stringify({ type: 'message', username, message }));
-  displayMessage(username, message);
+  displayMessage(username, message); // Nachricht sofort anzeigen
   messageInput.value = '';
 }
 
@@ -33,3 +43,11 @@ function displayMessage(user, message) {
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
+function displayUserList(users) {
+  usersContainer.innerHTML = '';
+  users.forEach(user => {
+    const userElement = document.createElement('div');
+    userElement.textContent = user;
+    usersContainer.appendChild(userElement);
+  });
+}
