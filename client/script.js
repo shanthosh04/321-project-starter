@@ -32,7 +32,7 @@ function sendMessage() {
   }
   const message = messageInput.value;
   socket.send(JSON.stringify({ type: 'message', username, message }));
-  displayMessage(username, message); // Nachricht sofort anzeigen
+  displayMessage(username, message); 
   messageInput.value = '';
 }
 
