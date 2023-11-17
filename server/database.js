@@ -1,7 +1,8 @@
+const mariadb = require("mariadb");
+
 let pool = null;
 
 const initializeMariaDB = () => {
-  const mariadb = require("mariadb");
   pool = mariadb.createPool({
     database: process.env.DB_NAME || "mychat",
     host: process.env.DB_HOST || "localhost",
@@ -11,14 +12,14 @@ const initializeMariaDB = () => {
   });
 };
 
-const executeSQL = async (query) => {
+const executeSQL = async (query, values = []) => {
   let conn;
   try {
     conn = await pool.getConnection();
-    const res = await conn.query(query);
+    const res = await conn.query(query, values);
     return res;
   } catch (err) {
-    console.log(err);
+    console.error(err);
   } finally {
     if (conn) conn.release();
   }
@@ -41,4 +42,21 @@ const initializeDBSchema = async () => {
   await executeSQL(messageTableQuery);
 };
 
-module.exports = { executeSQL, initializeMariaDB, initializeDBSchema };
+const addUser = async (username) => {
+  const query = 'INSERT INTO users (name) VALUES (?)';
+  await executeSQL(query, [username]);
+};
+
+const getUserByName = async (username) => {
+  const query = 'SELECT id FROM users WHERE name = ?';
+  const result = await executeSQL(query, [username]);
+  return result[0];
+};
+
+const saveMessage = async (username, message) => {
+  const user = await getUserByName(username);
+  const query = 'INSERT INTO messages (user_id, message) VALUES (?, ?)';
+  await executeSQL(query, [user.id, message]);
+};
+
+module.exports = { executeSQL, initializeMariaDB, initializeDBSchema, addUser, getUserByName, saveMessage };

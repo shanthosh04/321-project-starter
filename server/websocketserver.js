@@ -1,4 +1,5 @@
 const WebSocket = require("ws");
+const { addUser, saveMessage, getUserByName } = require("./database");
 
 const users = new Map();
 
@@ -8,15 +9,20 @@ const initializeWebsocketServer = (server) => {
   websocketServer.on("connection", (ws) => {
     console.log("New websocket connection");
 
-    ws.on("message", (message) => {
+    ws.on("message", async (message) => {
       const data = JSON.parse(message);
-      
-      switch(data.type) {
+
+      switch (data.type) {
         case 'join':
+          const user = await getUserByName(data.username);
+          if (!user) {
+            await addUser(data.username);
+          }
           users.set(ws, data.username);
           broadcastUserList(websocketServer);
           break;
         case 'message':
+          await saveMessage(data.username, data.message);
           broadcastMessage(websocketServer, data.username, data.message);
           break;
         case 'requestUsers':
