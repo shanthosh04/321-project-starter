@@ -27,5 +27,16 @@ services:
     ports:
       - 9200:80
 
+  nodejs:
+    image: shanthosh04/321_project:latest
+    depends_on:
+      - mariadb
+    ports:
+      - 3000:3000
+    restart: always
+    environment:
+      DB_HOST: mariadb
+      NODE_ENV: production
+
 volumes:
   m321_project_mariadb:
