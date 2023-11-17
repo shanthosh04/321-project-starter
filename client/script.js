@@ -42,7 +42,7 @@ sendButton.addEventListener('click', sendMessage);
 
 function sendMessage() {
   if (messageInput.value.trim() === '' || !username) {
-    alert('Please enter a username and a message.');
+    alert('Bitte geben Sie einen Benutzernamen und eine Nachricht ein.');
     return;
   }
   const message = messageInput.value;
@@ -80,12 +80,22 @@ const fetchCurrentUsers = () => {
   fetch('/api/users')
     .then(response => response.json())
     .then(users => users.forEach(user => displayUser(user.name)))
-    .catch(error => console.error('Error fetching users:', error));
+    .catch(error => console.error('Fehler beim Abrufen der Benutzer:', error));
 };
 
-const fetchCurrentMessages = () => {
-  fetch('/api/messages')
-    .then(response => response.json())
-    .then(messages => messages.forEach(message => displayMessage(message.username, message.message)))
-    .catch(error => console.error('Error fetching messages:', error));
+const fetchCurrentMessages = async () => {
+  try {
+    const usersResponse = await fetch('/api/users');
+    const users = await usersResponse.json();
+    const messagesResponse = await fetch('/api/messages');
+    const messages = await messagesResponse.json();
+    messages.forEach(message => {
+      const user = users.find(user => user.id === message.user_id);
+      if (user) {
+        displayMessage(user.name, message.message);
+      }
+    });
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Nachrichten:', error);
+  }
 };
