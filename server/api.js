@@ -4,7 +4,7 @@ const initializeAPI = (app) => {
   // Default REST API endpoint
   app.get("/api/hello", hello);
 
-  // API-Endpunkt zum Abrufen aller Benutzer
+    // API-Endpunkt zum Abrufen aller Benutzer
   app.get("/api/users", async (req, res) => {
     try {
       const users = await executeSQL("SELECT * FROM users");

@@ -61,8 +61,31 @@ function displayMessage(user, message) {
 function displayUserList(users) {
   usersContainer.innerHTML = '';
   users.forEach(user => {
-    const userElement = document.createElement('div');
-    userElement.textContent = user;
-    usersContainer.appendChild(userElement);
+    displayUser(user);
   });
 }
+
+function displayUser(user) {
+  const userElement = document.createElement('div');
+  userElement.textContent = user;
+  usersContainer.appendChild(userElement);
+}
+
+window.onload = () => {
+  fetchCurrentUsers();
+  fetchCurrentMessages();
+};
+
+const fetchCurrentUsers = () => {
+  fetch('/api/users')
+    .then(response => response.json())
+    .then(users => users.forEach(user => displayUser(user.name)))
+    .catch(error => console.error('Error fetching users:', error));
+};
+
+const fetchCurrentMessages = () => {
+  fetch('/api/messages')
+    .then(response => response.json())
+    .then(messages => messages.forEach(message => displayMessage(message.username, message.message)))
+    .catch(error => console.error('Error fetching messages:', error));
+};
